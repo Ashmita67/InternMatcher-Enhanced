@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <h2>Welcome back, {{ session.username }}!</h2>
+        <a href="{{ url_for('profile') }}" class="btn btn-accent">Update Profile & Resume</a>
+    </div>
+
+    <div style="margin-bottom: 2rem;">
+        <h3>Your Extracted Skills</h3>
+        {% if skills %}
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+            {% for skill in skills %}
+                <span class="skill-tag">{{ skill|title }}</span>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">You haven't uploaded a resume yet or no skills were found. <a href="{{ url_for('profile') }}" style="color:var(--primary);">Upload a resume</a> to get started.</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h3>Your Saved Jobs</h3>
+        {% if saved_jobs %}
+            <div class="job-grid">
+                {% for job in saved_jobs %}
+                <div class="job-card">
+                    <h4>{{ job.job_title }}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">{{ job.company }}</p>
+                    <p style="font-size: 0.8rem; margin: 1rem 0;">Saved on: {{ job.saved_at.strftime('%Y-%m-%d') }}</p>
+                    <a href="{{ job.url }}" target="_blank" class="btn btn-primary" style="display: block;">View Job Listing</a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">You haven't saved any jobs yet. Check out the <a href="{{ url_for('jobs') }}" style="color:var(--primary);">job board</a>.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

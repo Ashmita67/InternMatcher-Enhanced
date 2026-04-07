@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Recommended Internships</h2>
+    {% if not skills %}
+    <p style="color: var(--danger); font-size: 0.9rem;">
+        We don't have your skills yet! <a href="{{ url_for('profile') }}" style="color: var(--primary);">Upload a resume</a> to get personalized matches.
+    </p>
+    {% endif %}
+</div>
+
+{% if jobs %}
+<div class="job-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">{{ job.title }}</h3>
+            {% if job.match_score is defined %}
+            <span style="background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+                {{ job.match_score }}% Match
+            </span>
+            {% endif %}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0;">{{ job.company }} &bull; {{ job.location }}</p>
+        
+        <p style="font-size: 0.9rem; margin: 1rem 0; line-height: 1.5;">{{ job.description }}</p>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Required Skills:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                {% for skill in job.skills_required %}
+                <span class="skill-tag" style="font-size: 0.75rem;">{{ skill|title }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ job.url }}" target="_blank" class="btn btn-primary" style="flex: 1; padding: 0.5rem;">Apply Now</a>
+            <form method="POST" action="{{ url_for('save_job') }}" style="flex: 1;">
+                <input type="hidden" name="job_id" value="{{ job.id }}">
+                <input type="hidden" name="job_title" value="{{ job.title }}">
+                <input type="hidden" name="company" value="{{ job.company }}">
+                <input type="hidden" name="url" value="{{ job.url }}">
+                <button type="submit" class="btn" style="width: 100%; padding: 0.5rem; background: transparent; border: 1px solid var(--primary); color: var(--text-main);">Save</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card text-center">
+    <h3 style="margin-bottom: 1rem;">No Jobs Found</h3>
+    <p style="color: var(--text-muted);">Please try again later or update your profile to see more results.</p>
+</div>
+{% endif %}
+{% endblock %}

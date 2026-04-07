@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mt-2">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem;">Find Your Dream Internship</h1>
+    <p style="color: var(--text-muted); font-size: 1.25rem; max-width: 600px; margin: 0 auto 2rem auto;">
+        InternMatcher magically analyzes your resume, extracts your skills, and matches you with top tech internships suited explicitly for you.
+    </p>
+    {% if not session.get('user_id') %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary" style="width: auto; padding: 1rem 2rem; font-size: 1.1rem;">Get Started Now</a>
+    {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="width: auto; padding: 1rem 2rem; font-size: 1.1rem;">Go to Dashboard</a>
+    {% endif %}
+</div>
+{% endblock %}
