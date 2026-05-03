@@ -1,4 +1,4 @@
-# InternMatcher
+# InternMatcher – Resume-Based Job Matcher
 
 Smart internship matching platform that helps students find relevant internship opportunities based on their resume skills.  
 Upload a resume, extract skills automatically, and get internship recommendations with match scores.
