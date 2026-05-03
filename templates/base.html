@@ -6,8 +6,22 @@
     <title>InternMatcher</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Ensure canvas is truly fixed and never participates in flex layout */
+        #neural-bg {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: -1;
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <canvas id="neural-bg"></canvas>
+
     <nav>
         <a href="{{ url_for('index') }}" class="brand">InternMatcher</a>
         <ul>
@@ -35,5 +49,100 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+    (function () {
+        const canvas = document.getElementById('neural-bg');
+        const ctx    = canvas.getContext('2d');
+
+        const NODE_COUNT   = 80;
+        const CONNECT_DIST = 150;
+        const NODE_SPEED   = 0.45;
+        const NODE_COLOR   = 'rgba(129, 140, 248, 0.85)';
+        const LINE_COLOR   = [99, 102, 241];
+        const BG_COLOR     = '#0F172A';
+
+        let W, H, nodes;
+        let mouse = { x: -9999, y: -9999 };
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+
+        function initNodes() {
+            nodes = Array.from({ length: NODE_COUNT }, () => ({
+                x  : Math.random() * W,
+                y  : Math.random() * H,
+                vx : (Math.random() - 0.5) * NODE_SPEED,
+                vy : (Math.random() - 0.5) * NODE_SPEED,
+                r  : Math.random() * 2 + 1.5,
+            }));
+        }
+
+        function animLoop() {
+            /* Always fill background first — canvas must never be transparent */
+            ctx.fillStyle = BG_COLOR;
+            ctx.fillRect(0, 0, W, H);
+
+            for (let i = 0; i < nodes.length; i++) {
+                const a = nodes[i];
+
+                /* Mouse repulsion */
+                const mdx  = a.x - mouse.x;
+                const mdy  = a.y - mouse.y;
+                const mdst = Math.hypot(mdx, mdy);
+                if (mdst < 90 && mdst > 0) {
+                    const force = (90 - mdst) / 90 * 0.6;
+                    a.vx += (mdx / mdst) * force;
+                    a.vy += (mdy / mdst) * force;
+                    a.vx *= 0.96;
+                    a.vy *= 0.96;
+                }
+
+                /* Move & bounce */
+                a.x += a.vx;
+                a.y += a.vy;
+                if (a.x < 0 || a.x > W) a.vx *= -1;
+                if (a.y < 0 || a.y > H) a.vy *= -1;
+
+                /* Draw connections to nearby nodes */
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const b    = nodes[j];
+                    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+                    if (dist < CONNECT_DIST) {
+                        const alpha = (1 - dist / CONNECT_DIST) * 0.55;
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(${LINE_COLOR[0]},${LINE_COLOR[1]},${LINE_COLOR[2]},${alpha})`;
+                        ctx.lineWidth   = 0.7;
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                }
+
+                /* Draw node dot */
+                ctx.beginPath();
+                ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+                ctx.fillStyle = NODE_COLOR;
+                ctx.fill();
+            }
+
+            requestAnimationFrame(animLoop);
+        }
+
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('resize', () => { resize(); initNodes(); });
+
+        resize();
+        initNodes();
+        animLoop();
+    })();
+    </script>
+
 </body>
 </html>

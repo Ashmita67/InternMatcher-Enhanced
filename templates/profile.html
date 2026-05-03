@@ -1,34 +1,95 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card" style="max-width: 600px; margin: 0 auto;">
+<div class="card reveal" style="max-width: 600px; margin: 0 auto;">
     <h2 class="mb-1">Your Profile & Resume</h2>
     <p style="color: var(--text-muted); margin-bottom: 2rem;">
         Upload your resume (PDF) so InternMatcher can analyze it and extract your skills to find the perfect internships for you.
     </p>
 
-    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data" id="resumeForm">
         <div class="form-group">
             <label for="resume">Upload Resume (PDF only)</label>
-            <input type="file" id="resume" name="resume" accept="application/pdf" required>
+
+            <!-- Minimal Safe Addition: Drag & Drop Zone -->
+            <label class="drop-zone" id="dropZone">
+                <input type="file" id="resume" name="resume" accept="application/pdf" hidden required>
+                <div id="dropText">Drag & drop your resume here or click to upload</div>
+
+                <div class="progress-bar-wrap" id="progressWrap">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </label>
         </div>
+
         <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Upload & Analyze</button>
     </form>
 
     {% if profile and profile.updated_at %}
     <div style="margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
         <h3 style="font-size: 1.1rem;">Last Upload Details</h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted);">Uploaded on: {{ profile.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Uploaded on: {{ profile.updated_at.strftime('%Y-%m-%d %H:%M') }}
+        </p>
         
         <h4 style="margin-top: 1.5rem; font-size: 1rem;">Extracted Skills:</h4>
         <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
             {% for skill in skills %}
                 <span class="skill-tag">{{ skill|title }}</span>
             {% else %}
-                <span style="font-size: 0.9rem; color: var(--text-muted);">No skills extracted. Try a more detailed resume.</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">
+                    No skills extracted. Try a more detailed resume.
+                </span>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 </div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const input = document.getElementById('resume');
+const dropText = document.getElementById('dropText');
+const progressWrap = document.getElementById('progressWrap');
+const progressBar = document.getElementById('progressBar');
+
+dropZone.addEventListener('click', () => input.click());
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+
+    if (e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        dropText.textContent = e.dataTransfer.files[0].name;
+    }
+});
+
+input.addEventListener('change', () => {
+    if (input.files.length) {
+        dropText.textContent = input.files[0].name;
+    }
+});
+
+document.getElementById('resumeForm').addEventListener('submit', () => {
+    progressWrap.style.display = 'block';
+    let width = 0;
+
+    const interval = setInterval(() => {
+        width += 10;
+        progressBar.style.width = width + '%';
+
+        if (width >= 90) clearInterval(interval);
+    }, 200);
+});
+</script>
 {% endblock %}
