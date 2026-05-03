@@ -90,46 +90,66 @@ Follow these steps to run the project locally.
 
 ```bash
 git clone https://github.com/your-username/InternMatcher.git
-cd InternMatcher ```
+cd InternMatcher
+```
 
 ### 2. Create Virtual Environment
-```
+
+```bash
 python -m venv venv
 ```
+
 ### 3. Activate Virtual Environment
+
+**Mac/Linux**
+```bash
+source venv/bin/activate
 ```
-source venv/bin/activate  (Mac,Linux)
-venv\Scripts\activate     (Windows)
+
+**Windows**
+```bash
+venv\Scripts\activate
 ```
+
 ### 4. Install Dependencies
-```
+
+```bash
 pip install -r requirements.txt
 ```
+
 ### 5. Download SpaCy Model
-```
+
+```bash
 python -m spacy download en_core_web_sm
 ```
+
 ### 6. Setup Database
-```
+
+```bash
 mysql -u root -p < schema.sql
 ```
+
 ### 7. Configure Database
 
-Update database credentials in config.py
+Update database credentials in `config.py`
+
 ---
 
 ## Run the Project
-```
+
+```bash
 cd InternMatcher
 source venv/bin/activate
 python app.py
 ```
-Open in browser:
-http://127.0.0.1:5000/
+
+Open in browser:  
+`http://127.0.0.1:5000/`
 
 ---
 
 ## Workflow
+
 - Register or login
 - Upload resume
 - Extract skills
@@ -137,23 +157,21 @@ http://127.0.0.1:5000/
 - Search internships
 - Check match score
 - Save jobs
-
 ---
 
 ## Screenshots
 
 ### Landing Page
-static/img/Landingpage.png
-static/img/LP2.png
+![Landing Page](static/img/Landingpage.png)
 
 ### Dashboard
-static/img/Dashboard.png
+![Dashboard](static/img/Dashboard.png)
 
-### ResumeUpload
-static/img/ResumeUpload.png
+### Resume Upload
+![Resume Upload](static/img/ResumeUpload.png)
 
-### JobMatchResults
-static/img/JobMatchResults.png
+### Job Match Results
+![Job Match Results](static/img/JobMatchResults.png)
 
 ---
 ## Future Improvements
